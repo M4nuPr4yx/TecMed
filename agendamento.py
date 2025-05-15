@@ -1,59 +1,127 @@
+import customtkinter as ctk
 import tkinter as tk
 from tkinter import messagebox
+import subprocess as spr
 
-def agendar():
-    pnome = nome.get()
-    pcpf = cpf.get()
-    pdoutor = doutor.get()
-    pdata = data.get()
-    phorario = horario.get()
+# Configurações do tema
+ctk.set_appearance_mode("Dark")
+ctk.set_default_color_theme("blue")
 
-    if pnome and pcpf and pdoutor and pdata and phorario:
-        with open("agendamentos.txt", "a") as arquivo:
-            arquivo.write(f"Nome: {pnome}\nCPF: {pcpf}\nDoutor: {pdoutor}\nData: {pdata}\nHorário: {phorario}\n\n")
-        
-        messagebox.showinfo("Agendamento Confirmado", "Seu agendamento foi realizado com sucesso!")
-        
-        nome.delete(0, tk.END)
-        cpf.delete(0, tk.END)
-        doutor.delete(0, tk.END)
-        data.delete(0, tk.END)
-        horario.delete(0, tk.END)
-    else:
-        messagebox.showwarning("Erro", "Por favor, preencha todos os campos.")
+# Função para abrir a tela de login
+def abrir_login():
+    login_screen()
 
-janela = tk.Tk()
-janela.geometry("500x600")
-janela.title("Agendamento - TecMed")
-janela.config(bg="Light Blue")
+# Função para a tela de login
+def login_screen():
+    login_window = ctk.CTk()
+    login_window.geometry("300x300")
+    login_window.title("TecMed")
 
-titulo = tk.Label(janela, text="Agendamento de Consultas", font=("Arial", 18, "bold"), fg="#333", bg="Light Blue")
-titulo.pack(pady=20)
+    def abrir_agendamento():
+        agendamento_screen()
 
-tk.Label(janela, text="Nome Completo:", font=("Arial", 12), bg="Light Blue").pack(pady=5)
-nome = tk.Entry(janela, font=("Arial", 12), bd=2, relief="groove", width=30)
-nome.pack(pady=10)
+    ctk.CTkLabel(login_window, text="Fazer Login:").pack(pady=5)
+    ctk.CTkLabel(login_window, text="CPF cadastrado:").pack(pady=5)
+    ctk.CTkEntry(login_window).pack(pady=5)
+    ctk.CTkButton(login_window, text="Ir Para Agendamento", command=abrir_agendamento).pack(pady=5)
 
-tk.Label(janela, text="CPF:", font=("Arial", 12), bg="Light Blue").pack(pady=5)
-cpf = tk.Entry(janela, font=("Arial", 12), bd=2, relief="groove", width=30)
-cpf.pack(pady=10)
+    login_window.mainloop()
 
-tk.Label(janela, text="Doutor:", font=("Arial", 12), bg="Light Blue").pack(pady=5)
-doutor = tk.Entry(janela, font=("Arial", 12), bd=2, relief="groove", width=30)
-doutor.pack(pady=10)
+# Função para abrir a tela de agendamento
+def agendamento_screen():
+    agendamento_window = ctk.CTk()
+    agendamento_window.geometry("323x300")
+    agendamento_window.title("Agendamento")
 
-tk.Label(janela, text="Data (dd/mm/aaaa):", font=("Arial", 12), bg="Light Blue").pack(pady=5)
-data = tk.Entry(janela, font=("Arial", 12), bd=2, relief="groove", width=30)
-data.pack(pady=10)
+    def cancelar_agendamento():
+        cancelamento_screen()
 
-tk.Label(janela, text="Horário (hh:mm):", font=("Arial", 12), bg="Light Blue").pack(pady=5)
-horario = tk.Entry(janela, font=("Arial", 12), bd=2, relief="groove", width=30)
-horario.pack(pady=10)
+    def agendado():
+        # Salvar dados do agendamento
+        tipo_agendamento = opção.get()
+        data_agendamento = entry_data.get()
+        with open("agendamento.txt", "a") as file:
+            file.write(f"Tipo: {tipo_agendamento}, Data: {data_agendamento}\n")
+        messagebox.showinfo("Concluido!!", "Agendamento realizado com sucesso!")
 
-botao_agendar = tk.Button(janela, text="Agendar", font=("Arial", 14, "bold"), fg="white", bg="Green", bd=0, relief="raised", width=20, height=2, command=agendar)
-botao_agendar.pack(pady=20)
+    opção = ctk.IntVar()
 
-rodape = tk.Label(janela, text="TecMed - Agendamento de Consultas", font=("Arial", 10), fg="#333", bg="Light Blue")
-rodape.pack(side="bottom", pady=10)
+    ctk.CTkLabel(agendamento_window, text="Faça seu agendamento:").pack(pady=5)
+    ctk.CTkRadioButton(agendamento_window, text="Consulta", variable=opção, value=1).pack(pady=5)
+    ctk.CTkRadioButton(agendamento_window, text="Exame", variable=opção, value=2).pack(pady=5)
+    ctk.CTkRadioButton(agendamento_window, text="Retorno", variable=opção, value=3).pack(pady=5)
+    ctk.CTkLabel(agendamento_window, text="Data do agendamento:").pack(pady=5)
+    entry_data = ctk.CTkEntry(agendamento_window)
+    entry_data.pack(pady=5)
+    ctk.CTkButton(agendamento_window, text="Agendar", command=agendado).pack(pady=5)
+    ctk.CTkButton(agendamento_window, text="Cancelar Agendamento", command=cancelar_agendamento).pack(pady=5)
 
-janela.mainloop()
+    agendamento_window.mainloop()
+
+# Função para a tela de cancelamento
+def cancelamento_screen():
+    cancelamento_window = ctk.CTk()
+    cancelamento_window.geometry("300x300")
+    cancelamento_window.title("Cancelar")
+
+    def cancelamento():
+        messagebox.showwarning("Concluido", "Cancelado com sucesso!")
+
+    ctk.CTkLabel(cancelamento_window, text="Cancele aqui: ").pack(pady=5)
+    ctk.CTkButton(cancelamento_window, text="Cancelar", command=cancelamento).pack(pady=5)
+
+    cancelamento_window.mainloop()
+
+# Função para a tela de cadastro
+def cadastro_screen():
+    cadastro_window = ctk.CTk()
+    cadastro_window.geometry("800x800")
+    cadastro_window.title("TecMed")
+
+    def login():
+        login_screen()
+
+    opção = ctk.IntVar()
+
+    def salvar_dados_cadastro():
+        nome_usuario = entry_nome.get()
+        data_nascimento = entry_data_nascimento.get()
+        cpf = entry_cpf.get()
+        rg = entry_rg.get()
+        telefone = entry_telefone.get()
+        sexo = "Masculino" if opção.get() == 1 else "Feminino"
+
+        # Salvar dados do cadastro no arquivo
+        with open("cadastro.txt", "a") as file:
+            file.write(f"Nome: {nome_usuario}, Data Nascimento: {data_nascimento}, CPF: {cpf}, RG: {rg}, Telefone: {telefone}, Sexo: {sexo}\n")
+        messagebox.showinfo("Concluido", "Cadastro realizado com sucesso!")
+
+    ctk.CTkLabel(cadastro_window, text="Já é cadastrado?").pack(pady=5)
+    ctk.CTkButton(cadastro_window, text="Login", command=abrir_login).pack(pady=5)
+    ctk.CTkLabel(cadastro_window, text="Não é cadastrado? Cadastre AQUI EM BAIXO:").pack(pady=5)
+
+    ctk.CTkLabel(cadastro_window, text="Nome:").pack(pady=5)
+    entry_nome = ctk.CTkEntry(cadastro_window)
+    entry_nome.pack(pady=5)
+    ctk.CTkLabel(cadastro_window, text="Data de Nascimento:").pack(pady=5)
+    entry_data_nascimento = ctk.CTkEntry(cadastro_window)
+    entry_data_nascimento.pack(pady=5)
+    ctk.CTkLabel(cadastro_window, text="CPF:").pack(pady=5)
+    entry_cpf = ctk.CTkEntry(cadastro_window)
+    entry_cpf.pack(pady=5)
+    ctk.CTkLabel(cadastro_window, text="RG:").pack(pady=5)
+    entry_rg = ctk.CTkEntry(cadastro_window)
+    entry_rg.pack(pady=5)
+    ctk.CTkLabel(cadastro_window, text="Numero de Contato:").pack(pady=5)
+    entry_telefone = ctk.CTkEntry(cadastro_window)
+    entry_telefone.pack(pady=5)
+
+    ctk.CTkLabel(cadastro_window, text="Sexo:").pack(pady=5)
+    ctk.CTkRadioButton(cadastro_window, text="Masculino", variable=opção, value=1).pack(pady=5)
+    ctk.CTkRadioButton(cadastro_window, text="Feminino", variable=opção, value=2).pack(pady=5)
+    ctk.CTkButton(cadastro_window, text="Finalizar", command=salvar_dados_cadastro).pack(pady=5)
+
+    cadastro_window.mainloop()
+
+# Iniciar a tela de cadastro
+cadastro_screen()
